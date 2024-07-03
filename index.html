@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)http://nfbgu1.ru/webgl/webgl.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>three.js webgl - Кабинет физики</title>
+		
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			Кабинет физики
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://threejs.org/build/three.module.js",
+					"three/addons/": "https://threejs.org/examples/jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+
+			var camera, scene, renderer;
+			var controls;
+			var ambientLight, light;
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERA
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 0, 250, -250 );
+
+				// LIGHTS
+				ambientLight = new THREE.AmbientLight( 0x333333, 1.0 );	// 0.2
+
+				//light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				//light.position.set( 1, 1, 1 );
+				
+				light = new THREE.PointLight( 0xffffff, 150, 100 );
+				light.position.set( 2, 10, 0 );
+				// direction is set in GUI
+
+				// RENDERER
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				// EVENTS
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// CONTROLS
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.rotateSpeed = 0.5; 
+				controls.enableZoom = true;  
+				controls.zoomSpeed = 0.5;  
+
+				controls.minDistance = 10;
+				controls.maxDistance = 20;
+				
+				controls.enableDamping = true;
+
+				// scene itself
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xD3D3D3 );
+
+				scene.add( ambientLight );
+				scene.add( light );
+			
+
+				// Объекты меняем тут
+
+
+					{
+                        const objLoader = new OBJLoader();
+                        objLoader.load('assets/model/кабинет.obj', (root) => {
+                            scene.add(root);
+                        });
+                        const mtlLoader = new MTLLoader();
+                        mtlLoader.load('assets/model/кабинет.mtl', (mtl) => {
+                        mtl.preload();
+                        objLoader.setMaterials(mtl);
+                        objLoader.load('assets/model/кабинет.obj', (root) => {
+                        scene.add(root);
+                        });
+                        });
+                    
+                        
+                    }    				
+
+
+					
+
+			}
+
+			// EVENT HANDLERS
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update(); //
+				//Cube.position.x +=1;
+				//Cube.rotation.z += 0.1;
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}			
+
+
+		</script>
+
+	
+</body></html>
